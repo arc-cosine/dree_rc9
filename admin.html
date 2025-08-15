@@ -1,3 +1,1023 @@
+<!DOCTYPE html>
+<html lang='ko'> <!-- HTML 문서 시작 및 언어 설정 -->
+
+<head>
+    <meta charset="UTF-8"> <!-- 문자 인코딩 설정 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"> <!-- Internet Explorer 호환성 설정 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 뷰포트 설정 -->
+    <title>인증 페이지</title> <!-- 웹 페이지 제목 설정 -->
+
+    <style>
+    /* 날짜와 시간 스타일 설정 */
+    #date-time {
+        position: fixed; /* 화면 고정 위치 설정 */
+        bottom: 5px;
+        left: 20px;
+        font-family: "Your Custom Font", sans-serif;
+        font-size: 20px;
+        color: #222;
+        background-color: rgba(0, 0, 0, 0.2); /* 반투명 흰색 배경 설정 */
+        padding: 10px 15px;
+        border-radius: 10px;
+        transition: background-color 0.3s ease-in-out; /* 부드러운 배경색 전환 효과 설정 */
+        white-space: nowrap; /* 텍스트가 줄 바꿈되지 않도록 설정 */
+    }
+
+    /* 전역 스타일 설정 */
+    * {
+        box-sizing: border-box; /* 모든 요소의 크기 계산을 테두리를 포함한 크기로 설정 */
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji" !important;
+        /* 폰트 패밀리 설정 및 다양한 운영체제와 브라우저에서 일관된 폰트 스타일 보장 */
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #E0E0E0; /* 전체 페이지 배경색 설정 */
+    }
+
+    /* 로딩 마스크 스타일 설정 */
+    #loadMask {
+        position: fixed; /* 화면에 고정 위치 설정 */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 100; /* 다른 요소 위에 표시되도록 층 순서 설정 */
+        background-color: rgba(237, 239, 242, 0.9); /* 반투명 회색 배경 색상 설정 */
+        display: flex; /* 내부 요소를 가로 중앙으로 정렬하기 위해 flex 레이아웃 사용 */
+        justify-content: center;
+        align-items: center;
+    }
+
+    #loadMask > div {
+        text-align: center;
+    }
+
+    #loadMask > div {
+        font-size: 50px; /* 텍스트 크기 설정 */
+        color: #666; /* 텍스트 색상 설정 */
+    }
+
+    /* 비밀번호 입력 영역 스타일 설정 */
+    .passArea {
+        width: 300px; /* 입력 영역 너비 설정 */
+        margin: 0 auto; /* 가운데 정렬 설정 */
+        background-color: #fff; /* 입력 영역 배경색 설정 */
+        padding: 15px; /* 내부 여백 설정 */
+        border-radius: 15px; /* 모서리 둥글게 만듦 */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* 그림자 효과 설정 */
+        text-align: center; /* 텍스트 가운데 정렬 설정 */
+    }
+
+.Title1 {
+  width: 150px; /* 입력 영역의 너비를 설정합니다. */
+  margin: 0 auto; /* 가운데 정렬을 수행합니다. */
+  background-color: #fff; /* 입력 영역의 배경색을 설정합니다. */
+  padding: 15px; /* 내부 여백을 추가합니다. */
+  font-size: 20px; /* 텍스트 크기를 설정합니다. */
+  border-radius: 15px; /* 모서리를 둥글게 만듭니다. */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* 그림자 효과를 추가합니다. */
+  text-align: center; /* 텍스트를 가운데 정렬합니다. */
+}
+
+    #passData {
+        height: 50px; /* 입력 필드 높이 설정 */
+        width: 100%;
+        margin-bottom: 10px; /* 하단 여백 추가 */
+        padding: 10px; /* 내부 여백 추가 */
+        font-size: 17px; /* 텍스트 크기 설정 */
+        border: 1px solid #ccc; /* 테두리 설정 */
+        border-radius: 3px; /* 모서리 둥글게 만듦 */
+        -webkit-text-security: disc; /* 입력된 텍스트 숨김 처리 */
+        outline: none; /* 포커스 효과 제거 */
+    }
+
+    .activeBtn {
+        background: #4CAF50 !important; /* 활성 상태 배경색 변경 */
+    }
+
+    /* "기억하기" 체크박스 스타일 설정 */
+    label {
+        font-size: 17px; /* 텍스트 크기 설정 */
+        color: #666; /* 텍스트 색상 설정 */
+        display: flex; /* 내부 요소를 가로로 정렬하기 위해 flex 레이아웃 사용 */
+        align-items: center; /* 내부 요소를 세로로 정렬 설정 */
+        margin-bottom: 10px; /* 하단 여백 추가 */
+    }
+
+    #rememberMe {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px; /* 체크박스 너비 설정 */
+        height: 16px; /* 체크박스 높이 설정 */
+        border: 2px solid #ccc; /* 테두리 설정 */
+        border-radius: 5px; /* 모서리 둥글게 만듦 */
+        margin-right: 7px; /* 오른쪽 여백 추가 */
+        cursor: pointer; /* 커서 스타일을 포인터로 변경 */
+    }
+
+    #rememberMe::before {
+        content: "";
+        display: block;
+        width: 12px; /* 체크 마크 너비 설정 */
+        height: 12px; /* 체크 마크 높이 설정 */
+        background: #99c959; /* 체크 마크 배경색 설정 */
+        transform: scale(0); /* 초기에는 보이지 않도록 스케일 0 설정 */
+        border-radius: 2px;
+    }
+
+    #rememberMe:checked::before {
+        transform: scale(1); /* 체크되었을 때 스케일을 1로 확대하여 보이도록 설정 */
+    }
+
+    /* 제출 버튼 스타일 설정 */
+    #goChat {
+        font-size: 18px; /* 텍스트 크기 설정 */
+        background: #99c959; /* 배경색 설정 */
+        border: none; /* 테두리 제거 */
+        border-radius: 3px; /* 모서리 둥글게 만듦 */
+        color: #fff; /* 텍스트 색상 설정 */
+        padding: 10px 20px; /* 내부 여백 추가 */
+        cursor: pointer; /* 커서 스타일을 포인터로 변경 */
+    }
+    </style>
+</head>
+
+<body>
+    <!-- 로딩 화면을 감싸는 div 요소 -->
+    <div id="loadMask">
+        <div>
+            <!-- 날짜와 시간을 표시할 p 요소 -->
+            <p id="date-time"></p>
+
+            <!-- 비밀번호 입력 영역 -->
+            <div class="passArea">
+                <div class="Title1">웹 페이지</div>
+                <!-- 비밀번호를 입력할 input 요소 -->
+                <input id="passData" type="password" placeholder="여기에 비밀번호를 입력하세요." autocomplete="off" />
+                <!-- "비밀번호 기억하기" 체크 박스 (체크되어 있는 경우) -->
+                <!-- 비밀번호 기억하기 체크 박스는 enableRemember 변수에 따라 선택적으로 표시됩니다 -->
+                <label for="rememberMe">
+                    <input type="checkbox" id="rememberMe" onchange="updateCheckboxState()">
+                    비밀번호 기억하기
+                </label>
+                <!-- "인증하기" 버튼 -->
+                <div id="goChat">인증하기</div>
+            </div>
+        </div>
+    </div>
+    <script>
+        {const t=Uint8Array,n=Uint16Array,e=Int32Array,r=new t([0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0,0,0,0]),o=new t([0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13,0,0]),l=new t([16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15]),s=(t,r)=>{const o=new n(31);for(let n=0;n<31;++n)o[n]=r+=1<<t[n-1];const l=new e(o[30]);for(let t=1;t<30;++t)for(let n=o[t];n<o[t+1];++n)l[n]=n-o[t]<<5|t;return{b:o,r:l}},{b:c,r:i}=s(r,2);c[28]=258,i[258]=28;const{b:f}=s(o,0),a=new n(32768);for(let t=0;t<32768;++t){let n=(43690&t)>>1|(21845&t)<<1;n=(52428&n)>>2|(13107&n)<<2,n=(61680&n)>>4|(3855&n)<<4,a[t]=((65280&n)>>8|(255&n)<<8)>>1}const u=(t,e,r)=>{const o=t.length;let l=0;const s=new n(e);for(;l<o;++l)t[l]&&++s[t[l]-1];const c=new n(e);for(l=1;l<e;++l)c[l]=c[l-1]+s[l-1]<<1;let i;if(r){i=new n(1<<e);const r=15-e;for(l=0;l<o;++l)if(t[l]){const n=l<<4|t[l],o=e-t[l];let s=c[t[l]-1]++<<o;for(const t=s|(1<<o)-1;s<=t;++s)i[a[s]>>r]=n}}else for(i=new n(o),l=0;l<o;++l)t[l]&&(i[l]=a[c[t[l]-1]++]>>15-t[l]);return i},w=new t(288);for(let t=0;t<144;++t)w[t]=8;for(let t=144;t<256;++t)w[t]=9;for(let t=256;t<280;++t)w[t]=7;for(let t=280;t<288;++t)w[t]=8;const d=new t(32);for(let t=0;t<32;++t)d[t]=5;const b=u(w,9,1),h=u(d,5,1),g=t=>{let n=t[0];for(let e=1;e<t.length;++e)t[e]>n&&(n=t[e]);return n},y=(t,n,e)=>{const r=n/8|0;return(t[r]|t[r+1]<<8)>>(7&n)&e},k=(t,n)=>{const e=n/8|0;return(t[e]|t[e+1]<<8|t[e+2]<<16)>>(7&n)},m=t=>(t+7)/8|0,p=(n,e,r)=>{(null==e||e<0)&&(e=0),(null==r||r>n.length)&&(r=n.length);const o=new t(r-e);return o.set(n.subarray(e,r)),o},v=["unexpected EOF","invalid block type","invalid length/literal","invalid distance","stream finished","no stream handler",,"no callback","invalid UTF-8 data","extra field too long","date not in range 1980-2099","filename too long","stream finishing","invalid zip data"],E=(t,n,e)=>{const r=new Error(n||v[t]);if(r.code=t,Error.captureStackTrace&&Error.captureStackTrace(r,E),!e)throw r;return r},x=(n,e,s,i)=>{const a=n.length,w=i?i.length:0;if(!a||e.f&&!e.l)return s||new t(0);const d=!s||2!=e.i,v=e.i;s||(s=new t(3*a));const x=n=>{let e=s.length;if(n>e){const r=new t(Math.max(2*e,n));r.set(s),s=r}};let A=e.f||0,S=e.p||0,T=e.b||0,U=e.l,F=e.d,M=e.m,z=e.n;const I=8*a;do{if(!U){A=y(n,S,1);const r=y(n,S+1,3);if(S+=3,!r){const t=m(S)+4,r=n[t-4]|n[t-3]<<8,o=t+r;if(o>a){v&&E(0);break}d&&x(T+r),s.set(n.subarray(t,o),T),e.b=T+=r,e.p=S=8*o,e.f=A;continue}if(1==r)U=b,F=h,M=9,z=5;else if(2==r){const e=y(n,S,31)+257,r=y(n,S+10,15)+4,o=e+y(n,S+5,31)+1;S+=14;const s=new t(o),c=new t(19);for(let t=0;t<r;++t)c[l[t]]=y(n,S+3*t,7);S+=3*r;const i=g(c),f=(1<<i)-1,a=u(c,i,1);for(let t=0;t<o;){const e=a[y(n,S,f)];S+=15&e;const r=e>>4;if(r<16)s[t++]=r;else{let e=0,o=0;for(16==r?(o=3+y(n,S,3),S+=2,e=s[t-1]):17==r?(o=3+y(n,S,7),S+=3):18==r&&(o=11+y(n,S,127),S+=7);o--;)s[t++]=e}}const w=s.subarray(0,e),d=s.subarray(e);M=g(w),z=g(d),U=u(w,M,1),F=u(d,z,1)}else E(1);if(S>I){v&&E(0);break}}d&&x(T+131072);const p=(1<<M)-1,O=(1<<z)-1;let j=S;for(;;j=S){const t=U[k(n,S)&p],e=t>>4;if(S+=15&t,S>I){v&&E(0);break}if(t||E(2),e<256)s[T++]=e;else{if(256==e){j=S,U=null;break}{let t=e-254;if(e>264){const o=e-257,l=r[o];t=y(n,S,(1<<l)-1)+c[o],S+=l}const l=F[k(n,S)&O],a=l>>4;l||E(3),S+=15&l;let u=f[a];if(a>3){const t=o[a];u+=k(n,S)&(1<<t)-1,S+=t}if(S>I){v&&E(0);break}d&&x(T+131072);const b=T+t;if(T<u){const t=w-u,n=Math.min(u,b);for(t+T<0&&E(3);T<n;++T)s[T]=i[t+T]}for(;T<b;T+=4)s[T]=s[T-u],s[T+1]=s[T+1-u],s[T+2]=s[T+2-u],s[T+3]=s[T+3-u];T=b}}}e.l=U,e.p=j,e.b=T,e.f=A,U&&(A=1,e.m=M,e.d=F,e.n=z)}while(!A);return T==s.length?s:p(s,0,T)};self.inflateSync=(t,n)=>x(t,{i:2},n&&n.out,n&&n.dictionary)}
+    </script><script>
+// sjcl 객체 정의
+const sjcl = {
+    cipher: {},             // 암호화 관련 함수를 담는 객체
+    hash: {},               // 해시 관련 함수를 담는 객체
+    keyexchange: {},        // 키 교환 관련 함수를 담는 객체
+    mode: {},               // 모드 관련 함수를 담는 객체
+    misc: {},               // 기타 함수를 담는 객체
+    codec: {},              // 코덱 관련 함수를 담는 객체
+    exception: {            // 예외 상황을 다루는 객체
+        corrupt: function (message) {
+            // 데이터가 손상되었을 때 발생하는 예외 처리 함수
+            this.toString = function () {return "CORRUPT: " + this.message;};
+            this.message = message;
+        },
+        invalid: function (message) {
+            // 유효하지 않은 데이터가 입력되었을 때 발생하는 예외 처리 함수
+            this.toString = function () {return "INVALID: " + this.message;};
+            this.message = message;
+        },
+        bug: function (message) {
+            // 코드 내부 버그가 발견되었을 때 발생하는 예외 처리 함수
+            this.toString = function () {return "BUG: " + this.message;};
+            this.message = message;
+        },
+        notReady: function (message) {
+            // 사용 준비가 되지 않은 상태에서 작업을 시도할 때 발생하는 예외 처리 함수
+            this.toString = function () {return "NOT READY: " + this.message;};
+            this.message = message;
+        }
+    }
+};
+// 이 모듈은 비트 배열을 다루는 여러 유틸리티 함수를 포함하고 있습니다.
+
+sjcl.bitArray = {
+    // 비트 슬라이스 함수
+    bitSlice: function (a, bstart, bend) {
+        // a 배열에서 bstart와 bend 범위 내의 비트를 추출합니다.
+        // a 배열을 32비트 블록으로 나누고 bstart 위치로 이동한 다음,
+        // 필요한 비트 범위를 잘라냅니다.
+        a = sjcl.bitArray._shiftRight(a.slice(bstart / 32), 32 - (bstart & 31)).slice(1);
+        // bend가 정의되지 않은 경우 수정된 배열을 반환하고,
+        // 정의된 경우 비트 범위를 clamp 함수를 사용하여 제한합니다.
+        return (bend === undefined) ? a : sjcl.bitArray.clamp(a, bend - bstart);
+    },
+    // 두 비트 배열을 연결하는 함수
+    concat: function (a1, a2) {
+        if (a1.length === 0 || a2.length === 0) {
+            return a1.concat(a2);
+        }
+        let last = a1[a1.length - 1], shift = sjcl.bitArray.getPartial(last);
+        if (shift === 32) {
+            return a1.concat(a2);
+        } else {
+            // a2 배열을 오른쪽으로 shift 비트만큼 이동하고,
+            // a1과 연결하여 새로운 배열을 반환합니다.
+            return sjcl.bitArray._shiftRight(a2, shift, last | 0, a1.slice(0, a1.length - 1));
+        }
+    },
+    // 비트 배열의 길이를 비트 단위로 계산하는 함수
+    bitLength: function (a) {
+        let l = a.length, x;
+        if (l === 0) {return 0;}
+        x = a[l - 1];
+        return (l - 1) * 32 + sjcl.bitArray.getPartial(x);
+    },
+    // 비트 배열을 주어진 길이로 제한하는 함수
+    clamp: function (a, len) {
+        if (a.length * 32 < len) {return a;}
+        a = a.slice(0, Math.ceil(len / 32));
+        let l = a.length;
+        len = len & 31;
+        if (l > 0 && len) {
+            // 배열의 마지막 32비트 블록을 주어진 길이로 제한합니다.
+            a[l - 1] = sjcl.bitArray.partial(len, a[l - 1] & 0x80000000 >> (len - 1), 1);
+        }
+        return a;
+    },
+    // 부분 비트를 생성하는 함수
+    partial: function (len, x, _end) {
+        if (len === 32) {return x;}
+        return (_end ? x | 0 : x << (32 - len)) + len * 0x10000000000;
+    },
+    // 32비트 블록의 부분 비트 길이를 가져오는 함수
+    getPartial: function (x) {
+        return Math.round(x / 0x10000000000) || 32;
+    },
+    // 두 비트 배열이 같은지 확인하는 함수
+    equal: function (a, b) {
+        if (sjcl.bitArray.bitLength(a) !== sjcl.bitArray.bitLength(b)) {
+            return false;
+        }
+        let x = 0, i;
+        for (i = 0; i < a.length; i++) {
+            // 배열의 각 블록을 비교하여 다른 경우 false를 반환합니다.
+            x |= a[i] ^ b[i];
+        }
+        return (x === 0);
+    },
+    // 비트 배열을 오른쪽으로 shift 비트만큼 이동하는 함수
+    _shiftRight: function (a, shift, carry, out) {
+        let i, last2 = 0, shift2;
+        if (out === undefined) {out = [];}
+        for (; shift >= 32; shift -= 32) {
+            out.push(carry);
+            carry = 0;
+        }
+        if (shift === 0) {
+            return out.concat(a);
+        }
+        for (i = 0; i < a.length; i++) {
+            out.push(carry | a[i] >>> shift);
+            carry = a[i] << (32 - shift);
+        }
+        last2 = a.length ? a[a.length - 1] : 0;
+        shift2 = sjcl.bitArray.getPartial(last2);
+        out.push(sjcl.bitArray.partial(shift + shift2 & 31, (shift + shift2 > 32) ? carry : out.pop(), 1));
+        return out;
+    }
+};
+// sjcl 객체에 codec.bytes 속성을 추가합니다.
+sjcl.codec.bytes = {
+    // 비트 배열을 바이트 배열로 변환하는 함수입니다.
+    fromBits: function (arr) {
+        let out = [], bl = sjcl.bitArray.bitLength(arr), i, tmp;
+        // 비트 배열의 길이를 바이트로 나눈만큼 반복합니다.
+        for (i = 0; i < bl / 8; i++) {
+            if ((i & 3) === 0) {
+                tmp = arr[i / 4];
+            }
+            // 32비트 단위로 값을 추출하고 바이트 배열에 추가합니다.
+            out.push(tmp >>> 24);
+            tmp <<= 8;
+        }
+        return out;
+    },
+    // 바이트 배열을 비트 배열로 변환하는 함수입니다.
+    toBits: function (bytes) {
+        let out = [], i, tmp = 0;
+        // 바이트 배열의 각 바이트를 처리합니다.
+        for (i = 0; i < bytes.length; i++) {
+            tmp = tmp << 8 | bytes[i];
+            if ((i & 3) === 3) {
+                // 32비트 단위로 값을 추출하고 비트 배열에 추가합니다.
+                out.push(tmp);
+                tmp = 0;
+            }
+        }
+        if (i & 3) {
+            // 마지막에 남은 바이트를 처리합니다.
+            out.push(sjcl.bitArray.partial(8 * (i & 3), tmp));
+        }
+        return out;
+    }
+};
+// sjcl.codec.utf8String 객체를 정의합니다.
+sjcl.codec.utf8String = {
+    // 바이트 배열(arr)을 UTF-8 문자열로 변환하는 함수입니다.
+    fromBits: function (arr) {
+        let out = ""; // 결과를 저장할 변수를 초기화합니다.
+        let bl = sjcl.bitArray.bitLength(arr); // 배열의 비트 길이를 계산합니다.
+        let i, tmp;
+
+        // 비트 배열을 바이트 배열로 변환하고 UTF-16 문자열로 변환합니다.
+        for (i = 0; i < bl / 8; i++) {
+            if ((i & 3) === 0) {
+                tmp = arr[i / 4];
+            }
+            out += String.fromCharCode(tmp >>> 8 >>> 8 >>> 8);
+            tmp <<= 8;
+        }
+
+        // 변환된 UTF-16 문자열을 UTF-8로 디코딩하고 반환합니다.
+        return decodeURIComponent(escape(out));
+    },
+    // UTF-8 문자열(str)을 바이트 배열로 변환하는 함수입니다.
+    toBits: function (str) {
+        // 문자열을 UTF-8로 인코딩하고 다시 디코딩하여 원래 문자열로 변환합니다.
+        str = unescape(encodeURIComponent(str));
+        let out = [];
+        let i, tmp = 0;
+
+        // 문자열의 각 문자를 바이트 배열로 변환합니다.
+        for (i = 0; i < str.length; i++) {
+            tmp = tmp << 8 | str.charCodeAt(i);
+            if ((i & 3) === 3) {
+                out.push(tmp);
+                tmp = 0;
+            }
+        }
+
+        // 마지막 바이트 배열이 부분적인 경우 처리합니다.
+        if (i & 3) {
+            out.push(sjcl.bitArray.partial(8 * (i & 3), tmp));
+        }
+
+        // 바이트 배열을 반환합니다.
+        return out;
+    }
+};
+
+// SHA-1 해시 객체를 생성합니다. 생성자 함수입니다.
+sjcl.hash.sha1 = function (hash) {
+    if (hash) {
+        // 만약 이미 존재하는 해시 객체가 전달되면,
+        
+        // 현재 해시 객체의 내부 상태를 복사합니다.
+        this._h = hash._h.slice(0);
+        this._buffer = hash._buffer.slice(0);
+        this._length = hash._length;
+    } else {
+        // 전달된 해시 객체가 없다면,
+
+        // 새로운 SHA-1 해시 객체를 초기화합니다.
+        this.reset();
+    }
+};
+// sjcl.hash.sha1.hash 함수 정의
+sjcl.hash.sha1.hash = function (data) {
+    // 새로운 SHA-1 해시 객체를 생성합니다.
+    var sha1Instance = new sjcl.hash.sha1();
+
+    // 데이터를 해당 SHA-1 해시 객체에 업데이트합니다.
+    sha1Instance.update(data);
+
+    // 최종적인 해시 값을 반환합니다.
+    return sha1Instance.finalize();
+};
+
+// SHA-1 해시 함수의 프로토타입 정의
+sjcl.hash.sha1.prototype = {
+    // 블록 크기는 512비트로 설정
+    blockSize: 512,
+    // 해시 초기화
+    reset: function () {
+        this._h = this._init.slice(0); // 초기 해시 값을 복사
+        this._buffer = []; // 데이터 버퍼 초기화
+        this._length = 0; // 데이터 길이 초기화
+        return this; // 객체 자체를 반환하여 체이닝 가능하도록 함
+    },
+    // 데이터 업데이트
+    update: function (data) {
+        if (typeof data === "string") {
+            data = sjcl.codec.utf8String.toBits(data); // 문자열 데이터를 비트 배열로 변환
+        }
+        let i, b = this._buffer = sjcl.bitArray.concat(this._buffer, data),
+            ol = this._length,
+            nl = this._length = ol + sjcl.bitArray.bitLength(data);
+        // 데이터 길이가 2^53 - 1 비트를 초과하면 오류 발생
+        if (nl > 9007199254740991) {
+            throw new sjcl.exception.invalid("Cannot hash more than 2^53 - 1 bits");
+        }
+        if (typeof Uint32Array !== "undefined") {
+            let c = new Uint32Array(b);
+            let j = 0;
+            for (i = this.blockSize + ol - ((this.blockSize + ol) & (this.blockSize - 1)); i <= nl;
+                i += this.blockSize) {
+                this._block(c.subarray(16 * j, 16 * (j + 1)));
+                j += 1;
+            }
+            b.splice(0, 16 * j);
+        } else {
+            for (i = this.blockSize + ol - ((this.blockSize + ol) & (this.blockSize - 1)); i <= nl;
+                i += this.blockSize) {
+                this._block(b.splice(0, 16));
+            }
+        }
+        return this;
+    },
+    // 해시 최종화
+    finalize: function () {
+        let i, b = this._buffer, h = this._h;
+        b = sjcl.bitArray.concat(b, [sjcl.bitArray.partial(1, 1)]);
+        for (i = b.length + 2; i & 15; i++) {
+            b.push(0);
+        }
+        b.push(Math.floor(this._length / 0x100000000));
+        b.push(this._length | 0);
+        while (b.length) {
+            this._block(b.splice(0, 16));
+        }
+        this.reset(); // 해시 초기화
+        return h; // 최종 해시 값을 반환
+    },
+    // SHA-1 해시 초기 상태
+    _init: [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0],
+    // SHA-1 해시 연산에 사용되는 상수 키
+    _key: [0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xCA62C1D6],
+    // 해시 함수 연산
+    _f: function (t, b, c, d) {
+        if (t <= 19) {
+            return (b & c) | (~b & d); // t가 0~19 사이인 경우
+        } else if (t <= 39) {
+            return b ^ c ^ d; // t가 20~39 사이인 경우
+        } else if (t <= 59) {
+            return (b & c) | (b & d) | (c & d); // t가 40~59 사이인 경우
+        } else if (t <= 79) {
+            return b ^ c ^ d; // t가 60~79 사이인 경우
+        }
+    },
+    // 비트를 왼쪽으로 n만큼 회전
+    _S: function (n, x) {
+        return (x << n) | (x >>> 32 - n);
+    },
+    // 블록 단위 해시 연산
+    _block: function (words) {
+        let t, tmp, a, b, c, d, e,
+            h = this._h;
+        let w;
+        if (typeof Uint32Array !== "undefined") {
+            w = Array(80);
+            for (let j = 0; j < 16; j++) {
+                w[j] = words[j];
+            }
+        } else {
+            w = words;
+        }
+        a = h[0]; b = h[1]; c = h[2]; d = h[3]; e = h[4];
+        for (t = 0; t <= 79; t++) {
+            if (t >= 16) {
+                w[t] = this._S(1, w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16]);
+            }
+            tmp = (this._S(5, a) + this._f(t, b, c, d) + e + w[t] +
+                this._key[Math.floor(t / 20)]) | 0;
+            e = d;
+            d = c;
+            c = this._S(30, b);
+            b = a;
+            a = tmp;
+        }
+        h[0] = (h[0] + a) | 0;
+        h[1] = (h[1] + b) | 0;
+        h[2] = (h[2] + c) | 0;
+        h[3] = (h[3] + d) | 0;
+        h[4] = (h[4] + e) | 0;
+    }
+};
+sjcl.cipher.aes = function (key) {
+    // AES 테이블이 아직 초기화되지 않았다면 초기화 진행
+    if (!this._tables[0][0][0]) {
+        this._precompute();
+    }
+
+    let i, j, tmp,
+        encKey, decKey,
+        sbox = this._tables[0][4], decTable = this._tables[1],
+        keyLen = key.length, rcon = 1;
+
+    // 주어진 키의 길이가 4, 6, 8 중 하나가 아닌 경우 예외 발생
+    if (keyLen !== 4 && keyLen !== 6 && keyLen !== 8) {
+        throw new sjcl.exception.invalid("invalid aes key size");
+    }
+
+    // 암호화와 복호화에 사용할 키 생성
+    this._key = [encKey = key.slice(0), decKey = []];
+
+    // 키 스케줄링 (Round Key 생성)
+    for (i = keyLen; i < 4 * keyLen + 28; i++) {
+        tmp = encKey[i - 1];
+
+        // 라운드 키 생성
+        if (i % keyLen === 0 || (keyLen === 8 && i % keyLen === 4)) {
+            tmp = sbox[tmp >>> 24] << 24 ^ sbox[tmp >> 16 & 255] << 16 ^ sbox[tmp >> 8 & 255] << 8 ^ sbox[tmp & 255];
+
+            if (i % keyLen === 0) {
+                tmp = tmp << 8 ^ tmp >>> 24 ^ rcon << 24;
+                rcon = rcon << 1 ^ (rcon >> 7) * 283;
+            }
+        }
+
+        encKey[i] = encKey[i - keyLen] ^ tmp;
+    }
+
+    // 역 키 스케줄링 (복호화에 사용됨)
+    for (j = 0; i; j++, i--) {
+        tmp = encKey[j & 3 ? i : i - 4];
+
+        if (i <= 4 || j < 4) {
+            // 마지막 4개 라운드 키 복사
+            decKey[j] = tmp;
+        } else {
+            // 복호화를 위한 역 변환 수행
+            decKey[j] = decTable[0][sbox[tmp >>> 24]] ^
+                decTable[1][sbox[tmp >> 16 & 255]] ^
+                decTable[2][sbox[tmp >> 8 & 255]] ^
+                decTable[3][sbox[tmp & 255]];
+        }
+    }
+};
+
+sjcl.cipher.aes.prototype = {
+  // 데이터를 암호화하는 함수
+  encrypt: function (data) {
+    return this._crypt(data, 0);
+  },
+  // 데이터를 복호화하는 함수
+  decrypt: function (data) {
+    return this._crypt(data, 1);
+  },
+  // AES 알고리즘에서 사용되는 테이블 초기화
+  _tables: [[[], [], [], [], []], [[], [], [], [], []]],
+  // 테이블 미리 계산 함수
+  _precompute: function () {
+    // 다양한 테이블과 변수 초기화
+    let encTable = this._tables[0], decTable = this._tables[1],
+        sbox = encTable[4], sboxInv = decTable[4],
+        i, x, xInv, d = [], th = [], x2, x4, x8, s, tEnc, tDec;
+
+    // 초기 테이블 값 설정
+    for (i = 0; i < 256; i++) {
+      th[(d[i] = i << 1 ^ (i >> 7) * 283) ^ i] = i;
+    }
+
+    // S-box 초기화
+    for (x = xInv = 0; !sbox[x]; x ^= x2 || 1, xInv = th[xInv] || 1) {
+      s = xInv ^ xInv << 1 ^ xInv << 2 ^ xInv << 3 ^ xInv << 4;
+      s = s >> 8 ^ s & 255 ^ 99;
+      sbox[x] = s;
+      sboxInv[s] = x;
+      x8 = d[x4 = d[x2 = d[x]]];
+      tDec = x8 * 0x1010101 ^ x4 * 0x10001 ^ x2 * 0x101 ^ x * 0x1010100;
+      tEnc = d[s] * 0x101 ^ s * 0x1010100;
+      for (i = 0; i < 4; i++) {
+        encTable[i][x] = tEnc = tEnc << 24 ^ tEnc >>> 8;
+        decTable[i][s] = tDec = tDec << 24 ^ tDec >>> 8;
+      }
+    }
+
+    // 나머지 테이블 복사
+    for (i = 0; i < 5; i++) {
+      encTable[i] = encTable[i].slice(0);
+      decTable[i] = decTable[i].slice(0);
+    }
+  },
+  // 암호화 또는 복호화 진행 함수
+  _crypt: function (input, dir) {
+    // 입력 데이터 길이 확인
+    if (input.length !== 4) {
+      throw new sjcl.exception.invalid("invalid aes block size");
+    }
+    // 키와 입력 데이터 간 연산
+    let key = this._key[dir],
+        a = input[0] ^ key[0],
+        b = input[dir ? 3 : 1] ^ key[1],
+        c = input[2] ^ key[2],
+        d = input[dir ? 1 : 3] ^ key[3],
+        a2, b2, c2,
+        nInnerRounds = key.length / 4 - 2,
+        i,
+        kIndex = 4,
+        out = [0, 0, 0, 0],
+        table = this._tables[dir],
+        t0 = table[0],
+        t1 = table[1],
+        t2 = table[2],
+        t3 = table[3],
+        sbox = table[4];
+
+    // AES 알고리즘 라운드 수행
+    for (i = 0; i < nInnerRounds; i++) {
+      a2 = t0[a >>> 24] ^ t1[b >> 16 & 255] ^ t2[c >> 8 & 255] ^ t3[d & 255] ^ key[kIndex];
+      b2 = t0[b >>> 24] ^ t1[c >> 16 & 255] ^ t2[d >> 8 & 255] ^ t3[a & 255] ^ key[kIndex + 1];
+      c2 = t0[c >>> 24] ^ t1[d >> 16 & 255] ^ t2[a >> 8 & 255] ^ t3[b & 255] ^ key[kIndex + 2];
+      d = t0[d >>> 24] ^ t1[a >> 16 & 255] ^ t2[b >> 8 & 255] ^ t3[c & 255] ^ key[kIndex + 3];
+      kIndex += 4;
+      a = a2; b = b2; c = c2;
+    }
+
+    // 결과 값 계산
+    for (i = 0; i < 4; i++) {
+      out[dir ? 3 & -i : i] =
+        sbox[a >>> 24] << 24 ^
+        sbox[b >> 16 & 255] << 16 ^
+        sbox[c >> 8 & 255] << 8 ^
+        sbox[d & 255] ^
+        key[kIndex++];
+      a2 = a; a = b; b = c; c = d; d = a2;
+    }
+    return out;
+  }
+};
+// HMAC 클래스 정의
+sjcl.misc.hmac = function (key, Hash) {
+    // 해시 함수 지정 또는 기본으로 sha1 사용
+    this._hash = Hash = Hash || sjcl.hash.sha1;
+
+    // 확장 키 배열 초기화
+    let exKey = [[], []], i;
+
+    // 해시 함수의 블록 크기 가져오기
+    bs = Hash.prototype.blockSize / 32;
+
+    // 기본 해시 객체 초기화
+    this._baseHash = [new Hash(), new Hash()];
+
+    // 키가 블록 크기보다 큰 경우, 해시 함수로 키 해싱
+    if (key.length > bs) {
+        key = Hash.hash(key);
+    }
+
+    // 내부 키 계산
+    for (i = 0; i < bs; i++) {
+        exKey[0][i] = key[i] ^ 0x36363636;
+        exKey[1][i] = key[i] ^ 0x5C5C5C5C;
+    }
+
+    // 내부 해시 객체 업데이트
+    this._baseHash[0].update(exKey[0]);
+    this._baseHash[1].update(exKey[1]);
+
+    // 결과 해시 객체 초기화
+    this._resultHash = new Hash(this._baseHash[0]);
+};
+
+// sjcl.misc.hmac.prototype.encrypt 및 sjcl.misc.hmac.prototype.mac 함수를 정의합니다.
+sjcl.misc.hmac.prototype.encrypt = sjcl.misc.hmac.prototype.mac = function (data) {
+    // 만약 이전에 업데이트된 적이 없다면,
+    if (!this._updated) {
+        // 데이터를 업데이트하고,
+        this.update(data);
+        // 그리고 데이터에 대한 다이제스트를 반환합니다.
+        return this.digest(data);
+    } else {
+        // 이미 업데이트된 HMAC에 대해 'encrypt'를 호출하면 오류를 발생시킵니다.
+        throw new sjcl.exception.invalid("encrypt on already updated hmac called!");
+    }
+};
+// HMAC 객체의 reset 메서드 정의
+sjcl.misc.hmac.prototype.reset = function () {
+    // HMAC 객체 내부에 저장된 해시 결과를 초기화합니다.
+    // 새로운 해시 객체를 생성하고, 이를 기본 해시 알고리즘의 초기 값으로 설정합니다.
+    this._resultHash = new this._hash(this._baseHash[0]);
+
+    // 업데이트 플래그를 false로 설정하여, 이후 데이터 업데이트가 필요함을 나타냅니다.
+    this._updated = false;
+};
+// 이 코드는 HMAC 객체의 'update' 메서드를 정의합니다.
+sjcl.misc.hmac.prototype.update = function (data) {
+    // '_updated' 변수를 true로 설정하여 업데이트가 이루어졌음을 표시합니다.
+    this._updated = true;
+    
+    // '_resultHash' 객체를 사용하여 입력 데이터 'data'를 해싱합니다.
+    this._resultHash.update(data);
+};
+// HMAC 클래스의 digest 메서드 정의
+sjcl.misc.hmac.prototype.digest = function () {
+    // this._resultHash.finalize()를 호출하여 현재 메시지의 해시 값을 계산하고 w에 저장
+    let w = this._resultHash.finalize();
+
+    // this._hash를 사용하여 새 해시 객체를 생성하고, w를 업데이트하고 최종 해시 값을 계산하여 result에 저장
+    let result = new (this._hash)(this._baseHash[1]).update(w).finalize();
+
+    // 계산이 완료되면 내부 상태를 재설정하여 클래스를 재사용할 수 있도록 함
+    this.reset();
+
+    // 최종 HMAC 값인 result 반환
+    return result;
+};
+// pbkdf2 함수 정의: 비밀번호와 소금을 사용하여 파생 키를 생성하는 함수
+sjcl.misc.pbkdf2 = function (password, salt, count, length, Prff) {
+    // count와 length가 주어지지 않았을 경우 기본값 설정
+    count = count || 10000;
+    // length와 count가 음수인 경우 예외 처리
+    if (length < 0 || count < 0) {
+        throw new sjcl.exception.invalid("pbkdf2에 잘못된 매개변수");
+    }
+    // password와 salt를 비트 배열로 변환
+    if (typeof password === "string") {
+        password = sjcl.codec.utf8String.toBits(password);
+    }
+    if (typeof salt === "string") {
+        salt = sjcl.codec.utf8String.toBits(salt);
+    }
+    // 사용할 PRF(가상 무작위 함수)를 설정, 기본값은 HMAC
+    Prff = Prff || sjcl.misc.hmac;
+    let prf = new Prff(password), // PRF 객체 생성
+        u, ui, i, j, k, out = [], b = sjcl.bitArray; // 사용할 변수들 초기화
+    // 파생 키의 길이가 주어지지 않았거나 1보다 작을 때까지 반복
+    for (k = 1; 32 * out.length < (length || 1); k++) {
+        u = ui = prf.encrypt(b.concat(salt, [k])); // PRF에 소금과 카운터를 입력하여 u 초기화
+        for (i = 1; i < count; i++) {
+            ui = prf.encrypt(ui); // PRF를 count번 반복하여 ui 업데이트
+            for (j = 0; j < ui.length; j++) {
+                u[j] ^= ui[j]; // u와 ui를 XOR하여 u 업데이트
+            }
+        }
+        out = out.concat(u); // 결과 배열에 u를 추가
+    }
+    if (length) { out = b.clamp(out, length); } // 결과 배열을 주어진 길이로 클램핑
+    return out; // 파생 키 반환
+};
+sjcl.random = {
+    // 무작위 단어 생성 함수
+    randomWords: function (nbytes) {
+        // 암호화 모듈을 가져오는 함수 정의
+        function getCryptoModule() {
+            try {
+                return require("crypto");
+            }
+            catch (e) {
+                return null;
+            }
+        }
+        
+        let crypto;
+        
+        // 브라우저 환경인 경우
+        if (typeof window !== "undefined") {
+            if (window.crypto) {
+                crypto = window.crypto;
+            } else if (window.msCrypto) {
+                crypto = window.msCrypto;
+            }
+        } 
+        // 웹 워커 환경인 경우
+        else if (typeof self !== "undefined" && self.crypto) {
+            crypto = self.crypto;
+        } 
+        // Node.js 환경인 경우
+        else if (typeof module !== "undefined" && module.exports) {
+            crypto = getCryptoModule();
+        } 
+        // 전역 객체 환경인 경우
+        else if (typeof global !== "undefined" && global.crypto) {
+            crypto = global.crypto;
+        }
+
+        try {
+            if (crypto) {
+                // crypto.getRandomValues 사용 가능한 경우
+                if (crypto.getRandomValues) {
+                    return sjcl.codec.bytes.toBits(crypto.getRandomValues(new Uint8Array(nbytes)));
+                }
+                // crypto.randomBytes 사용 가능한 경우
+                if (crypto.randomBytes) {
+                    return sjcl.codec.bytes.toBits(new Uint8Array(crypto.randomBytes(nbytes)));
+                }
+            } else {
+                // getRandomValues 함수가 없는 경우 대체 함수 사용
+                return getRandomValues(nbytes);
+            }
+        } catch (e) {
+            // 예외가 발생한 경우 대체 함수 사용
+            return getRandomValues(nbytes);
+        }
+    },
+    
+    // 대체 무작위 값 생성 함수
+    getRandomValues: function (nbytes) {
+        let words = [];
+        
+        // 무작위 값을 생성하는 내부 함수 정의
+        let r = function (m_w) {
+            let m_z = 0x3ade68b1;
+            let mask = 0xffffffff;
+            return function () {
+                m_z = (0x9069 * (m_z & 0xFFFF) + (m_z >> 0x10)) & mask;
+                m_w = (0x4650 * (m_w & 0xFFFF) + (m_w >> 0x10)) & mask;
+                let result = ((m_z << 0x10) + m_w) & mask;
+                result /= 0x100000000;
+                result += 0.5;
+                return result * (Math.random() > .5 ? 1 : -1);
+            };
+        };
+        
+        // nbytes에 지정된 바이트 수 만큼 반복하여 무작위 값을 생성하고 배열에 추가
+        for (let i = 0, rcache; i < nbytes; i += 4) {
+            let _r = r((rcache || Math.random()) * 0x100000000);
+            rcache = _r() * 0x3ade67b7;
+            words.push((_r() * 0x100000000) | 0);
+        }
+        
+        return words;
+    }
+};
+// CTR 모드 객체 정의
+sjcl.mode.ctr = {
+    name: "ctr",
+    
+    // 암호화 함수 정의
+    encrypt: function (prf, plaintext, iv) {
+        return sjcl.mode.ctr._calculate(prf, plaintext, iv);
+    },
+    
+    // 복호화 함수 정의
+    decrypt: function (prf, ciphertext, iv) {
+        return sjcl.mode.ctr._calculate(prf, ciphertext, iv);
+    },
+    
+    // 실제 암호화 및 복호화를 수행하는 내부 함수
+    _calculate: function (prf, data, iv) {
+        let l, bl, res, c, d, e, i;
+        
+        // IV(Initialization Vector)가 128비트인지 확인
+        if (sjcl.bitArray.bitLength(iv) !== 128) {
+            throw new sjcl.exception.invalid("CTR 모드의 IV는 128비트여야 합니다.");
+        }
+        
+        // 데이터의 길이를 확인하고 빈 배열인 경우 바로 반환
+        if (!(l = data.length)) {
+            return [];
+        }
+        
+        // IV와 데이터의 복사본을 만들어 초기화
+        c = iv.slice(0);
+        d = data.slice(0);
+        bl = sjcl.bitArray.bitLength(d);
+        
+        // 데이터 블록을 암호화
+        for (i = 0; i < l; i += 4) {
+            e = prf.encrypt(c);
+            d[i] ^= e[0];
+            d[i + 1] ^= e[1];
+            d[i + 2] ^= e[2];
+            d[i + 3] ^= e[3];
+            
+            // IV를 증가시키기 위한 루프
+            for (let carry = 3; carry >= 0; carry--) {
+                if (++c[carry]) break;
+            }
+        }
+        
+        // 결과 데이터를 비트 길이에 맞게 잘라서 반환
+        return sjcl.bitArray.clamp(d, bl);
+    }
+};
+    </script>
 <script>
-    document.write(unescape("%3C%21DOCTYPE%20html%3E%0A%3Chtml%20lang%3D%22ko%22%3E%0A%3Chead%3E%0A%20%20%20%20%3Cmeta%20charset%3D%22UTF-8%22%20/%3E%0A%20%20%20%20%3Cmeta%20name%3D%22viewport%22%20content%3D%22width%3Ddevice-width%2C%20initial-scale%3D1%22%20/%3E%0A%20%20%20%20%3Ctitle%3EDNS%20%uAD00%uB9AC%uC790%20%uD398%uC774%uC9C0%3C/title%3E%0A%20%20%20%20%3Cstyle%3E%0A%20%20%20%20%20%20%20%20table%20%7B%20border-collapse%3A%20collapse%3B%20width%3A%20400px%3B%20margin%3A%2020px%20auto%3B%20%7D%0A%20%20%20%20%20%20%20%20th%2C%20td%20%7B%20border%3A%201px%20solid%20%23ccc%3B%20padding%3A%208px%3B%20text-align%3A%20center%3B%20%7D%0A%20%20%20%20%20%20%20%20input%20%7B%20width%3A%2090%25%3B%20padding%3A%204px%3B%20%7D%0A%20%20%20%20%20%20%20%20button%20%7B%20cursor%3A%20pointer%3B%20%7D%0A%20%20%20%20%20%20%20%20%23addRowBtn%20%7B%20width%3A%20100%25%3B%20padding%3A%206px%3B%20%7D%0A%20%20%20%20%20%20%20%20%23content%20%7B%20display%3A%20none%3B%20%7D%0A%20%20%20%20%3C/style%3E%0A%3C/head%3E%0A%3Cbody%3E%0A%0A%3Cdiv%20id%3D%22content%22%3E%0A%0A%20%20%20%20%3Ch2%20style%3D%22text-align%3Acenter%3B%22%3E%uCC28%uB2E8%20%uC774%uBA54%uC77C%20%uAD00%uB9AC%3C/h2%3E%0A%20%20%20%20%3Ctable%20id%3D%22emailTable%22%3E%0A%20%20%20%20%20%20%20%20%3Cthead%3E%0A%20%20%20%20%20%20%20%20%3Ctr%3E%3Cth%3E%uC0AD%uC81C%3C/th%3E%3Cth%3E%uC0AC%uC6A9%uC790%20%uC774%uBA54%uC77C%3C/th%3E%3C/tr%3E%0A%20%20%20%20%20%20%20%20%3C/thead%3E%0A%20%20%20%20%20%20%20%20%3Ctbody%3E%3C/tbody%3E%0A%20%20%20%20%20%20%20%20%3Ctfoot%3E%0A%20%20%20%20%20%20%20%20%3Ctr%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Ctd%20colspan%3D%222%22%3E%3Cbutton%20id%3D%22addRowBtn%22%3E+%20%uC774%uBA54%uC77C%20%uCD94%uAC00%3C/button%3E%3C/td%3E%0A%20%20%20%20%20%20%20%20%3C/tr%3E%0A%20%20%20%20%20%20%20%20%3C/tfoot%3E%0A%20%20%20%20%3C/table%3E%0A%0A%3C/div%3E%0A%0A%3Cscript%3E%0A%20%20%20%20const%20PASSWORD%20%3D%20%22murimurievolution%22%3B%20%20//%20%uC6D0%uD558%uB294%20%uBE44%uBC00%uBC88%uD638%uB85C%20%uBCC0%uACBD%uD558%uC138%uC694%0A%0A%20%20%20%20const%20BIN_ID%20%3D%20%2268989c58ae596e708fc6af4a%22%3B%20//%20jsonbin%20bin%20id%0A%20%20%20%20const%20API_KEY%20%3D%20%22%242a%2410%24v8MnmFSL/GoywF.qohAheOJAFCQDPmBW20gtMMHbxdN/zrkvUU1MW%22%3B%20//%20jsonbin%20secret%20key%0A%20%20%20%20const%20API_URL%20%3D%20%60https%3A//api.jsonbin.io/v3/b/%24%7BBIN_ID%7D%60%3B%0A%0A%20%20%20%20let%20blockedEmails%20%3D%20%5B%5D%3B%0A%0A%20%20%20%20async%20function%20loadEmails%28%29%20%7B%0A%20%20%20%20%20%20%20%20try%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20res%20%3D%20await%20fetch%28API_URL%20+%20%22/latest%22%2C%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20headers%3A%20%7B%20%22X-Master-Key%22%3A%20API_KEY%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20data%20%3D%20await%20res.json%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20blockedEmails%20%3D%20data.record.blockedEmails%20%7C%7C%20%5B%5D%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20renderTable%28%29%3B%0A%20%20%20%20%20%20%20%20%7D%20catch%20%28e%29%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20alert%28%22%uB370%uC774%uD130%20%uB85C%uB4DC%20%uC2E4%uD328%3A%20%22%20+%20e.message%29%3B%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%0A%20%20%20%20async%20function%20saveEmails%28%29%20%7B%0A%20%20%20%20%20%20%20%20try%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20res%20%3D%20await%20fetch%28API_URL%2C%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20method%3A%20%22PUT%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20headers%3A%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22Content-Type%22%3A%20%22application/json%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22X-Master-Key%22%3A%20API_KEY%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22X-Bin-Versioning%22%3A%20%22false%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20body%3A%20JSON.stringify%28%7B%20blockedEmails%20%7D%29%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20%28%21res.ok%29%20throw%20new%20Error%28%22%uC800%uC7A5%20%uC2E4%uD328%22%29%3B%0A%20%20%20%20%20%20%20%20%7D%20catch%20%28e%29%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20alert%28%22%uC800%uC7A5%20%uC2E4%uD328%3A%20%22%20+%20e.message%29%3B%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%0A%20%20%20%20function%20renderTable%28%29%20%7B%0A%20%20%20%20%20%20%20%20const%20tbody%20%3D%20document.querySelector%28%22%23emailTable%20tbody%22%29%3B%0A%20%20%20%20%20%20%20%20tbody.innerHTML%20%3D%20%22%22%3B%0A%20%20%20%20%20%20%20%20blockedEmails.forEach%28%28email%2C%20idx%29%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20tr%20%3D%20document.createElement%28%22tr%22%29%3B%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20tdDel%20%3D%20document.createElement%28%22td%22%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20delBtn%20%3D%20document.createElement%28%22button%22%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20delBtn.textContent%20%3D%20%22X%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20delBtn.style.color%20%3D%20%22red%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20delBtn.addEventListener%28%22click%22%2C%20%28%29%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%28confirm%28%60%22%24%7Bemail%7D%22%20%uC774%uBA54%uC77C%uC744%20%uCC28%uB2E8%20%uBAA9%uB85D%uC5D0%uC11C%20%uC0AD%uC81C%uD558%uC2DC%uACA0%uC2B5%uB2C8%uAE4C%3F%60%29%29%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20blockedEmails.splice%28idx%2C%201%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20saveEmails%28%29.then%28renderTable%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20tdDel.appendChild%28delBtn%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20tr.appendChild%28tdDel%29%3B%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20tdEmail%20%3D%20document.createElement%28%22td%22%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20input%20%3D%20document.createElement%28%22input%22%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20input.type%20%3D%20%22email%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20input.value%20%3D%20email%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20input.required%20%3D%20true%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20input.addEventListener%28%22change%22%2C%20%28%29%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20val%20%3D%20input.value.trim%28%29.toLowerCase%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28%21val%20%7C%7C%20%21validateEmail%28val%29%29%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20alert%28%22%uC720%uD6A8%uD55C%20%uC774%uBA54%uC77C%uC744%20%uC785%uB825%uD558%uC138%uC694.%22%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20input.value%20%3D%20blockedEmails%5Bidx%5D%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%28blockedEmails.some%28%28e%2C%20i%29%20%3D%3E%20e%20%3D%3D%3D%20val%20%26%26%20i%20%21%3D%3D%20idx%29%29%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20alert%28%22%uC774%uBBF8%20%uC874%uC7AC%uD558%uB294%20%uC774%uBA54%uC77C%uC785%uB2C8%uB2E4.%22%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20input.value%20%3D%20blockedEmails%5Bidx%5D%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20blockedEmails%5Bidx%5D%20%3D%20val%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20saveEmails%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20tdEmail.appendChild%28input%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20tr.appendChild%28tdEmail%29%3B%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20tbody.appendChild%28tr%29%3B%0A%20%20%20%20%20%20%20%20%7D%29%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20function%20validateEmail%28email%29%20%7B%0A%20%20%20%20%20%20%20%20return%20/%5E%5B%5E%5Cs@%5D+@%5B%5E%5Cs@%5D+%5C.%5B%5E%5Cs@%5D+%24/.test%28email%29%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20document.getElementById%28%22addRowBtn%22%29.addEventListener%28%22click%22%2C%20%28%29%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20const%20newEmail%20%3D%20prompt%28%22%uCD94%uAC00%uD560%20%uC774%uBA54%uC77C%uC744%20%uC785%uB825%uD558%uC138%uC694%3A%22%29%3B%0A%20%20%20%20%20%20%20%20if%20%28%21newEmail%29%20return%3B%0A%20%20%20%20%20%20%20%20const%20email%20%3D%20newEmail.trim%28%29.toLowerCase%28%29%3B%0A%20%20%20%20%20%20%20%20if%20%28%21validateEmail%28email%29%29%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20alert%28%22%uC720%uD6A8%uD55C%20%uC774%uBA54%uC77C%uC744%20%uC785%uB825%uD558%uC138%uC694.%22%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20return%3B%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20if%20%28blockedEmails.includes%28email%29%29%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20alert%28%22%uC774%uBBF8%20%uC874%uC7AC%uD558%uB294%20%uC774%uBA54%uC77C%uC785%uB2C8%uB2E4.%22%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20return%3B%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20blockedEmails.push%28email%29%3B%0A%20%20%20%20%20%20%20%20saveEmails%28%29.then%28renderTable%29%3B%0A%20%20%20%20%7D%29%3B%0A%0A%20%20%20%20//%20%uBE44%uBC00%uBC88%uD638%20%uD655%uC778%0A%20%20%20%20function%20checkPassword%28%29%20%7B%0A%20%20%20%20%20%20%20%20const%20input%20%3D%20prompt%28%22%uBE44%uBC00%uBC88%uD638%uB97C%20%uC785%uB825%uD558%uC138%uC694%3A%22%29%3B%0A%20%20%20%20%20%20%20%20if%20%28input%20%3D%3D%3D%20PASSWORD%29%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById%28%22content%22%29.style.display%20%3D%20%22block%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20loadEmails%28%29%3B%0A%20%20%20%20%20%20%20%20%7D%20else%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20alert%28%22%uBE44%uBC00%uBC88%uD638%uAC00%20%uD2C0%uB838%uC2B5%uB2C8%uB2E4.%22%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20document.body.innerHTML%20%3D%20%22%3Ch2%20style%3D%27text-align%3Acenter%3B%20color%3Ared%3B%27%3E%uC811%uADFC%20%uAD8C%uD55C%uC774%20%uC5C6%uC2B5%uB2C8%uB2E4.%3C/h2%3E%22%3B%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%0A%20%20%20%20checkPassword%28%29%3B%0A%20%20%20%20%0A%3C/script%3E%0A%0A%3C/body%3E%0A%3C/html%3E"));
+    // 이전 밀리세컨드 값 저장
+    let previousMilliseconds = null;
+
+    // 시간과 날짜를 가져와서 p 요소에 표시하는 함수
+    function displayDateTime() {
+        const now = new Date();
+        const dateTimeElement = document.getElementById('date-time');
+
+        const dateFormatOptions = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+        };
+
+        const timeFormatOptions = {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            fractionalSecondDigits: 1, // 밀리세컨드 표시 (3자리)
+            hour12: true,
+        };
+
+        const formattedDate = now.toLocaleDateString('kr', dateFormatOptions);
+        const formattedTime = now.toLocaleTimeString('en-US', timeFormatOptions);
+        const milliseconds = now.getMilliseconds();
+
+        // 이전 밀리세컨드 값과 현재 값이 다를 때만 표시
+        if (milliseconds !== previousMilliseconds) {
+            dateTimeElement.innerHTML = "Date: " + formattedDate + "<br> Time: " + formattedTime + ".";
+dateTimeElement.style.textAlign = "left"; // 우측 정렬 스타일 추가
+            previousMilliseconds = milliseconds;
+        }
+    }
+
+    // 페이지가 로드될 때마다 시간과 날짜를 업데이트
+    displayDateTime();
+    setInterval(displayDateTime, 1); // 1밀리초마다 시간 및 날짜 업데이트
 </script>
+    <script>
+        const encryptedHTML = "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";
+        passData.focus();
+        passData.oninput = () => {
+            if (passData.value.trim().length) {
+                goChat.classList.add("activeBtn");
+            } else {
+                goChat.classList.remove("activeBtn");
+            }
+        }
+        goChat.onclick = () => {
+            decryptString(encryptedHTML, passData.value);
+        }
+        const decoder = new TextDecoder();
+        const passwordVerifierLen = 4;
+        const aesKeyLen = 16; // aes-128-ctr
+        const saltLen = 8;
+        const base64ToUint8Array = (base64) => {
+            let byteString = atob(base64);
+            let bytes = new Uint8Array(byteString.length);
+            for (let i = 0; i < byteString.length; i++) {
+                bytes[i] = byteString.charCodeAt(i);
+            }
+            return bytes
+        }
+        const decryptFromKey = (derivedKey, uint8Data) => {
+            const derivedPassVerifier = sjcl.bitArray.bitSlice(derivedKey, aesKeyLen * 8);
+            const passVerifyValue = sjcl.codec.bytes.toBits(uint8Data.subarray(saltLen, saltLen + passwordVerifierLen));
+            if (rememberMe && rememberMe.checked) {
+                let baseKey = btoa(String.fromCharCode.apply(null, sjcl.codec.bytes.fromBits(derivedKey)));
+                localStorage.setItem("staticDerivedKey", baseKey);
+                if (expireDays) {
+                    localStorage.setItem("staticKeyExpire", new Date().getTime() + expireDays * 8.64e7);
+                }
+            }const aesKey = sjcl.bitArray.bitSlice(derivedKey, 0, aesKeyLen * 8);
+            const encryptedData = uint8Data.subarray(saltLen + passwordVerifierLen);
+            let result = new Uint8Array(sjcl.codec.bytes.fromBits(sjcl.mode.ctr.decrypt(new sjcl.cipher.aes(aesKey), sjcl.codec.bytes.toBits(encryptedData), [0, 0, 0, 0])));
+            if (self.inflateSync) {
+                result = self.inflateSync(result);
+            }
+            const utf8Result = decoder.decode(result)
+            document.write(utf8Result);
+            document.close();
+        }
+        const decryptString = (data, password) => {
+            const uint8Data = base64ToUint8Array(data);
+            const salt = sjcl.codec.bytes.toBits(uint8Data.subarray(0, saltLen));
+            const derivedKey = sjcl.misc.pbkdf2(password, salt, 1000, (aesKeyLen + passwordVerifierLen) * 8);
+            decryptFromKey(derivedKey, uint8Data)
+        }
+        const expireDays = 0;
+        window.onload = () => {
+            let localKey = localStorage.getItem("staticDerivedKey");
+            if (localKey) {
+                let localExpire = localStorage.getItem("staticKeyExpire")
+                if (localExpire && (localExpire < new Date().getTime())) {
+                    localStorage.removeItem("staticDerivedKey")
+                    return;
+                }
+                const derivedKey = sjcl.codec.bytes.toBits(base64ToUint8Array(localKey));
+                const uint8Data = base64ToUint8Array(encryptedHTML);
+                decryptFromKey(derivedKey, uint8Data);
+            }
+        }
+goChat.onclick = () => {
+    if (passData.value.trim().length === 0) {
+        alert("비밀번호의 입력이 없습니다.");
+        return;
+    }
+
+if (passData.value.trim().length > 0) {
+    alert("비밀번호 입력 값이 존재합니다.");
+}
+
+    // 비밀번호를 사용하여 데이터 복호화
+    decryptString(encryptedHTML, passData.value);
+
+    // 입력 비밀번호 필드 초기화
+    passData.value = "";
+};
+
+
+    </script>
+</body>
+
+</html>
