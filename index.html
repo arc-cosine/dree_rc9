@@ -1307,13 +1307,13 @@
             for (let i = 1; i <= 50; i++) {
                 if (i === 46) continue; // 46번 제외
                 const img = document.createElement("img");
-                img.src = i === 46 ? `./icons/icon_${i}.gif` : `./icon_${i}.png`;
+                img.src = `./icons/icon_${i}.png`;
                 img.style.width = "100%";
                 img.style.height = "100%";
                 img.style.cursor = "pointer";
 
                 img.onclick = () => {
-                    url.value = i === 46 ? `./icons/icon_${i}.gif` : `./icon_${i}.png`;
+                    url.value =  `./icons/icon_${i}.png`;
                     picker.style.display = "none";
                 };
 
