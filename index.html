@@ -1263,72 +1263,95 @@
         }
     }
     // 이모지 선택기 열기
-    function openEmojiPicker() {
-        const url = document.getElementById("imageInput");
+function openEmojiPicker() {
+    const url = document.getElementById("imageInput");
 
-        if (window.innerWidth <= 480) {
-            // 모바일: 풀스크린 모달
-            const mobileModal = document.getElementById("emoji-mobile-modal");
-            const mobileGrid = document.getElementById("emoji-mobile-grid");
-            mobileGrid.innerHTML = "";
+    if (window.innerWidth <= 480) {
+        // 모바일: 풀스크린 모달
+        const mobileModal = document.getElementById("emoji-mobile-modal");
+        const mobileGrid = document.getElementById("emoji-mobile-grid");
+        
+        // 토글 기능
+        if (mobileModal.style.display === "block") {
+            mobileModal.style.display = "none";
+            return;
+        }
 
-            // 모바일 그리드 5x10
-            mobileGrid.style.display = "grid";
-            mobileGrid.style.gridTemplateColumns = "repeat(5, 1fr)"; // 5열
-            mobileGrid.style.gridTemplateRows = "repeat(10, 1fr)";   // 10행
-            mobileGrid.style.gap = "4px";
+        mobileGrid.innerHTML = "";
 
+        // 모바일 그리드 5x10
+        mobileGrid.style.display = "grid";
+        mobileGrid.style.gridTemplateColumns = "repeat(5, 1fr)";
+        mobileGrid.style.gridTemplateRows = "repeat(10, 1fr)";
+        mobileGrid.style.gap = "4px";
 
-            for (let i = 1; i <= 50; i++) {
-                const img = document.createElement("img");
-                mobileGrid.appendChild(img);
-                
-                if (i === 46) continue; // 46번 제외
-            }
+        for (let i = 1; i <= 50; i++) {
+            if (i === 46) continue; // 46번 제외
 
-            mobileModal.style.display = "block";
-        } else {
-            // PC: 글쓰기 모달 안 picker
-            const picker = document.getElementById("emoji-picker");
-            picker.innerHTML = "";
+            const img = document.createElement("img");
+            img.src = `./icons/icon_${i}.png`;
+            img.style.width = "100%";
+            img.style.height = "100%";
+            img.style.cursor = "pointer";
 
-            picker.style.display = "grid";
-            picker.style.gridTemplateColumns = "repeat(5, 1fr)";
-            picker.style.gridTemplateRows = "repeat(10, 1fr)";
-            picker.style.gap = "4px";
-            picker.style.width = "600px";
-            picker.style.height = "3000px";
-            picker.style.border = "1px solid #ccc";
-            picker.style.background = "#fff";
-            picker.style.padding = "5px";
-            picker.style.boxSizing = "border-box";
-            picker.style.position = "absolute";
-            picker.style.zIndex = "100";
+            img.onclick = () => {
+                url.value = `./icons/icon_${i}.png`;
+                mobileModal.style.display = "none"; // 클릭 시 닫기
+            };
 
-            for (let i = 1; i <= 50; i++) {
+            mobileGrid.appendChild(img);
+        }
 
-                const img = document.createElement("img");
-                if (i === 46) continue; // 46번 제외
-                img.src = `./icons/icon_${i}.png`;
-                img.style.width = "100%";
-                img.style.height = "100%";
-                img.style.cursor = "pointer";
+        mobileModal.style.display = "block";
+    } else {
+        // PC: 글쓰기 모달 안 picker
+        const picker = document.getElementById("emoji-picker");
 
-                img.onclick = () => {
-                    url.value =  `./icons/icon_${i}.png`;
-                    picker.style.display = "none";
-                };
+        // 토글 기능
+        if (picker.style.display === "grid") {
+            picker.style.display = "none";
+            return;
+        }
 
-                picker.appendChild(img);
-            }
+        picker.innerHTML = "";
+
+        picker.style.display = "grid";
+        picker.style.gridTemplateColumns = "repeat(10, 1fr)";
+        picker.style.gridTemplateRows = "repeat(5, 1fr)";
+        picker.style.gap = "4px";
+        picker.style.width = "600px";
+        picker.style.height = "300px"; // 3000px는 너무 큼
+        picker.style.border = "1px solid #ccc";
+        picker.style.background = "#fff";
+        picker.style.padding = "5px";
+        picker.style.boxSizing = "border-box";
+        picker.style.position = "absolute";
+        picker.style.zIndex = "100";
+
+        for (let i = 1; i <= 50; i++) {
+            if (i === 46) continue; // 46번 제외
+
+            const img = document.createElement("img");
+            img.src = `./icons/icon_${i}.png`;
+            img.style.width = "100%";
+            img.style.height = "100%";
+            img.style.cursor = "pointer";
+
+            img.onclick = () => {
+                url.value = `./icons/icon_${i}.png`;
+                picker.style.display = "none";
+            };
+
+            picker.appendChild(img);
         }
     }
+}
 
+// 모바일 닫기 버튼
+function closeMobileEmojiPicker() {
+    document.getElementById("emoji-mobile-modal").style.display = "none";
+}
 
-    // 모바일 닫기 버튼
-    function closeMobileEmojiPicker() {
-        document.getElementById("emoji-mobile-modal").style.display = "none";
-    }
 
 
 
