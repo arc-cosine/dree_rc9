@@ -1306,8 +1306,9 @@
             picker.style.zIndex = "100";
 
             for (let i = 1; i <= 50; i++) {
-                if (i === 46) continue; // 46번 제외
+
                 const img = document.createElement("img");
+                if (i === 46) continue; // 46번 제외
                 img.src = `./icons/icon_${i}.png`;
                 img.style.width = "100%";
                 img.style.height = "100%";
