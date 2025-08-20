@@ -10,6 +10,18 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <style>
+        #emoji-picker {
+            display: none;
+            border: 1px solid #ccc;
+            background: #fff;
+            padding: 5px;
+            margin-top: 5px;
+            max-height: 100px; /* 높이 제한 */
+            overflow-y: auto;  /* 스크롤 */
+            font-size: 14px;   /* 작게 표시 */
+            border-radius: 5px;
+        }
+
         #searchInput {
             width: 100%;
             max-width: 500px;
@@ -381,6 +393,13 @@
         <input type="text" id="titleInput" placeholder="제목" required />
         <input type="url" id="imageInput" placeholder="이미지/유튜브 동영상 링크 (선택)" />
         <textarea id="contentInput" placeholder="내용 입력" rows="5"></textarea>
+        <button onclick="openEmojiPicker()" style="padding: 5px 10px;">😀 이모티콘 추가</button>
+        <div id="emoji-picker" style="display: none; border: 1px solid #ccc; background: #fff; padding: 5px; position: absolute; z-index: 100;"></div>
+        <!-- 모바일 전용 풀스크린 모달 -->
+        <div id="emoji-mobile-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#fff; z-index:200; padding:10px; box-sizing:border-box; overflow:auto;">
+            <button onclick="closeMobileEmojiPicker()" style="margin-bottom:10px;">닫기 ✖️</button>
+            <div id="emoji-mobile-grid" style="display:grid; grid-template-columns:repeat(10,1fr); grid-template-rows:repeat(5,1fr); gap:4px;"></div>
+        </div>
         <div style="margin-top: 10px;">
             <label for="mealDate">🍱 급식 추가: </label>
             <input type="date" id="mealDate" />
@@ -397,7 +416,7 @@
         <button id="submitBtn" onclick="submitPost()">올리기</button>
     </div>
 </div>
-
+</div>
 <div class="post-detail" id="postDetail"></div>
 <!-- 신고 모달 -->
 <!-- HTML 부분 -->
@@ -1240,9 +1259,80 @@
             showDetail(foundPost);
         } else {
             const postList = document.getElementById("postGrid");
-                alert("게시물을 찾을 수 없습니다.")
+            alert("게시물을 찾을 수 없습니다.")
         }
     }
+    // 이모지 선택기 열기
+    function openEmojiPicker() {
+        const url = document.getElementById("imageInput");
+
+        if (window.innerWidth <= 480) {
+            // 모바일: 풀스크린 모달
+            const mobileModal = document.getElementById("emoji-mobile-modal");
+            const mobileGrid = document.getElementById("emoji-mobile-grid");
+            mobileGrid.innerHTML = "";
+
+            // 모바일 그리드 5x10
+            mobileGrid.style.display = "grid";
+            mobileGrid.style.gridTemplateColumns = "repeat(5, 1fr)"; // 5열
+            mobileGrid.style.gridTemplateRows = "repeat(10, 1fr)";   // 10행
+            mobileGrid.style.gap = "4px";
+
+
+            for (let i = 1; i <= 50; i++) {
+                if (i === 46) continue; // 46번 제외
+
+                mobileGrid.appendChild(img);
+            }
+
+            mobileModal.style.display = "block";
+        } else {
+            // PC: 글쓰기 모달 안 picker
+            const picker = document.getElementById("emoji-picker");
+            picker.innerHTML = "";
+
+            picker.style.display = "grid";
+            picker.style.gridTemplateColumns = "repeat(5, 1fr)";
+            picker.style.gridTemplateRows = "repeat(10, 1fr)";
+            picker.style.gap = "4px";
+            picker.style.width = "600px";
+            picker.style.height = "3000px";
+            picker.style.border = "1px solid #ccc";
+            picker.style.background = "#fff";
+            picker.style.padding = "5px";
+            picker.style.boxSizing = "border-box";
+            picker.style.position = "absolute";
+            picker.style.zIndex = "100";
+
+            for (let i = 1; i <= 50; i++) {
+                if (i === 46) continue; // 46번 제외
+                const img = document.createElement("img");
+                img.src = i === 46 ? `./icons/icon_${i}.gif` : `./icon_${i}.png`;
+                img.style.width = "100%";
+                img.style.height = "100%";
+                img.style.cursor = "pointer";
+
+                img.onclick = () => {
+                    url.value = i === 46 ? `./icons/icon_${i}.gif` : `./icon_${i}.png`;
+                    picker.style.display = "none";
+                };
+
+                picker.appendChild(img);
+            }
+        }
+    }
+
+
+    // 모바일 닫기 버튼
+    function closeMobileEmojiPicker() {
+        document.getElementById("emoji-mobile-modal").style.display = "none";
+    }
+
+
+
+
+
+
 
     //                   _ooOoo_
     //                  o8888888o
